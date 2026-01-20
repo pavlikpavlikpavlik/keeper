@@ -1,0 +1,9 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Главная страница{% endblock %}
+
+{% block body %}
+    <h1>Добро пожаловать на мой сайт!</h1>
+    <p>Это моя первая страница на Symfony</p>
+    <a href="{{ path('blogpage') }}">Посмотреть блог</a>
+{% endblock %}

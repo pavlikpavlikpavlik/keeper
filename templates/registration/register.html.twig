@@ -1,0 +1,98 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Регистрация{% endblock %}
+
+{% block body %}
+<div class="row justify-content-center">
+    <div class="col-md-6 col-lg-5">
+        <div class="card-custom">
+            <div class="text-center mb-4">
+                <div class="category-icon mb-3" style="color: #34c759; font-size: 3rem;">
+                    <i class="fas fa-user-plus"></i>
+                </div>
+                <h1 class="h3 mb-3 fw-normal">Регистрация</h1>
+                <p class="text-muted">Создайте новый аккаунт</p>
+            </div>
+
+            {{ form_start(registrationForm) }}
+                <div class="mb-3">
+                    {{ form_label(registrationForm.email, 'Email', {'label_attr': {'class': 'form-label fw-semibold'}}) }}
+                    <div class="input-group">
+                        <span class="input-group-text bg-light border-end-0">
+                            <i class="fas fa-envelope text-muted"></i>
+                        </span>
+                        {{ form_widget(registrationForm.email, {'attr': {
+                            'class': 'form-control border-start-0 rounded-end-3',
+                            'placeholder': 'your@email.com'
+                        }}) }}
+                    </div>
+                    {{ form_errors(registrationForm.email) }}
+                </div>
+
+                <div class="mb-3">
+                    {{ form_label(registrationForm.plainPassword.first, 'Пароль', {'label_attr': {'class': 'form-label fw-semibold'}}) }}
+                    <div class="input-group">
+                        <span class="input-group-text bg-light border-end-0">
+                            <i class="fas fa-lock text-muted"></i>
+                        </span>
+                        {{ form_widget(registrationForm.plainPassword.first, {'attr': {
+                            'class': 'form-control border-start-0 rounded-end-3',
+                            'placeholder': 'Введите пароль'
+                        }}) }}
+                    </div>
+                </div>
+
+                <div class="mb-4">
+                    {{ form_label(registrationForm.plainPassword.second, 'Повторите пароль', {'label_attr': {'class': 'form-label fw-semibold'}}) }}
+                    <div class="input-group">
+                        <span class="input-group-text bg-light border-end-0">
+                            <i class="fas fa-lock text-muted"></i>
+                        </span>
+                        {{ form_widget(registrationForm.plainPassword.second, {'attr': {
+                            'class': 'form-control border-start-0 rounded-end-3',
+                            'placeholder': 'Повторите пароль'
+                        }}) }}
+                    </div>
+                    {{ form_errors(registrationForm.plainPassword) }}
+                </div>
+
+                <div class="d-grid gap-2">
+                    <button class="btn btn-smooth btn-success-smooth py-2" type="submit">
+                        <i class="fas fa-user-plus me-2"></i> Зарегистрироваться
+                    </button>
+                </div>
+            {{ form_end(registrationForm) }}
+
+            <div class="text-center mt-4 pt-3 border-top">
+                <p class="text-muted mb-2">Уже есть аккаунт?</p>
+                <a href="{{ path('app_login') }}" class="btn btn-smooth" 
+                   style="background: transparent; color: #007aff; border: 1px solid #007aff;">
+                    <i class="fas fa-sign-in-alt me-2"></i> Войти
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.card-custom {
+    max-width: 450px;
+    margin: 0 auto;
+}
+
+.form-control {
+    height: 45px;
+}
+
+.btn-smooth {
+    height: 45px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.input-group-text {
+    height: 45px;
+}
+</style>
+{% endblock %}

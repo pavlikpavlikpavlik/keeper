@@ -1,0 +1,74 @@
+{{ form_start(form) }}
+    <div class="row">
+        <div class="col-md-6">
+            <div class="mb-3">
+                {{ form_label(form.amount, 'Сумма', {'label_attr': {'class': 'form-label fw-semibold'}}) }}
+                <div class="input-group">
+                    <span class="input-group-text bg-light border-end-0">
+                        <i class="fas fa-ruble-sign text-muted"></i>
+                    </span>
+                    {{ form_widget(form.amount, {'attr': {
+                        'class': 'form-control border-start-0 rounded-end-3',
+                        'placeholder': '0.00',
+                        'step': '0.01'
+                    }}) }}
+                </div>
+                <small class="form-text text-muted">Введите сумму транзакции</small>
+            </div>
+        </div>
+        
+        <div class="col-md-6">
+            <div class="mb-3">
+                {{ form_label(form.date, 'Дата', {'label_attr': {'class': 'form-label fw-semibold'}}) }}
+                <div class="input-group">
+                    <span class="input-group-text bg-light border-end-0">
+                        <i class="fas fa-calendar text-muted"></i>
+                    </span>
+                    {{ form_widget(form.date, {'attr': {
+                        'class': 'form-control border-start-0 rounded-end-3',
+                        'required': 'required'
+                    }}) }}
+                </div>
+                <small class="form-text text-muted">Дата транзакции</small>
+            </div>
+        </div>
+    </div>
+
+    <div class="mb-3">
+        {{ form_label(form.category, 'Категория', {'label_attr': {'class': 'form-label fw-semibold'}}) }}
+        <div class="input-group">
+            <span class="input-group-text bg-light border-end-0">
+                <i class="fas fa-tag text-muted"></i>
+            </span>
+            {{ form_widget(form.category, {'attr': {
+                'class': 'form-select border-start-0 rounded-end-3'
+            }}) }}
+        </div>
+        <small class="form-text text-muted">Выберите категорию для транзакции</small>
+    </div>
+
+    <div class="mb-4">
+        {{ form_label(form.description, 'Описание', {'label_attr': {'class': 'form-label fw-semibold'}}) }}
+        <div class="input-group">
+            <span class="input-group-text bg-light border-end-0">
+                <i class="fas fa-align-left text-muted"></i>
+            </span>
+            {{ form_widget(form.description, {'attr': {
+                'class': 'form-control border-start-0 rounded-end-3',
+                'placeholder': 'Необязательное описание (можно оставить пустым)'
+            }}) }}
+        </div>
+        <small class="form-text text-muted">Описание транзакции (необязательно)</small>
+    </div>
+
+    <div class="d-flex gap-2 mt-4">
+        <button class="btn btn-smooth btn-primary-smooth flex-grow-1 py-2" type="submit">
+            <i class="fas fa-save me-2"></i> {{ button_label|default('Сохранить') }}
+        </button>
+        
+        <a href="{{ path('app_transaction_index') }}" class="btn btn-smooth py-2" 
+           style="background: transparent; color: #6c757d; border: 1px solid #d2d2d7;">
+            <i class="fas fa-times me-2"></i> Отмена
+        </a>
+    </div>
+{{ form_end(form) }}

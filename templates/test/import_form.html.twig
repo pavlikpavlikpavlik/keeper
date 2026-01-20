@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Тест импорта</title>
+</head>
+<body>
+    <h1>Тест загрузки файла</h1>
+    <form method="post" action="{{ path('app_test_import_handler') }}" enctype="multipart/form-data">
+        <input type="file" name="test_file" required>
+        <button type="submit">Отправить</button>
+    </form>
+    <p><a href="{{ path('app_test_simple') }}">Простой тест</a></p>
+</body>
+</html>

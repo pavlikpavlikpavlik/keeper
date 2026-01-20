@@ -1,0 +1,63 @@
+{{ form_start(form) }}
+    <div class="row">
+        <div class="col-md-6">
+            <div class="mb-3">
+                {{ form_label(form.name, 'Название категории', {'label_attr': {'class': 'form-label fw-semibold'}}) }}
+                <div class="input-group">
+                    <span class="input-group-text bg-light border-end-0">
+                        <i class="fas fa-tag text-muted"></i>
+                    </span>
+                    {{ form_widget(form.name, {'attr': {
+                        'class': 'form-control border-start-0 rounded-end-3',
+                        'placeholder': 'Например: Еда, Транспорт, Зарплата...'
+                    }}) }}
+                </div>
+                <small class="form-text text-muted">Укажите понятное название категории</small>
+            </div>
+        </div>
+        
+        <div class="col-md-6">
+            <div class="mb-3">
+                {{ form_label(form.type, 'Тип операции', {'label_attr': {'class': 'form-label fw-semibold'}}) }}
+                <div class="input-group">
+                    <span class="input-group-text bg-light border-end-0">
+                        <i class="fas fa-exchange-alt text-muted"></i>
+                    </span>
+                    {{ form_widget(form.type, {'attr': {
+                        'class': 'form-select border-start-0 rounded-end-3'
+                    }}) }}
+                </div>
+                <small class="form-text text-muted">Выберите тип финансовой операции</small>
+            </div>
+        </div>
+    </div>
+
+    <!-- Поле цвета (если есть в форме) -->
+    {% if form.color is defined %}
+    <div class="mb-3">
+        {{ form_label(form.color, 'Цвет категории', {'label_attr': {'class': 'form-label fw-semibold'}}) }}
+        <div class="input-group" style="max-width: 200px;">
+            {{ form_widget(form.color, {'attr': {
+                'class': 'form-control form-control-color rounded-3',
+                'title': 'Выберите цвет для категории',
+                'value': form.color.vars.value ? form.color.vars.value : '#007aff'
+            }}) }}
+        </div>
+        <small class="form-text text-muted">Выберите цвет для визуализации</small>
+    </div>
+    {% endif %}
+
+    <!-- Кнопки действий -->
+    <div class="d-flex gap-2 mt-4">
+        {% set is_edit = form.vars.value.id is defined and form.vars.value.id is not null %}
+        <button class="btn btn-smooth {{ is_edit ? 'btn-primary-smooth' : 'btn-success-smooth' }} flex-grow-1 py-2">
+            <i class="fas {{ is_edit ? 'fa-save' : 'fa-plus-circle' }} me-2"></i> 
+            {{ is_edit ? 'Обновить категорию' : 'Создать категорию' }}
+        </button>
+        
+        <a href="{{ path('app_category_index') }}" class="btn btn-smooth py-2" 
+           style="background: transparent; color: #6c757d; border: 1px solid #d2d2d7;">
+            <i class="fas fa-times me-2"></i> Отмена
+        </a>
+    </div>
+{{ form_end(form) }}

@@ -1,0 +1,11 @@
+<form method="post" action="{{ path('app_category_delete', {'id': category.id}) }}" 
+      onsubmit="return confirm('Вы уверены, что хотите удалить категорию «{{ category.name }}»? Все связанные транзакции будут перемещены в категорию «Без категории».');" 
+      class="d-inline-block">
+    <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ category.id) }}">
+    <button class="btn btn-smooth py-2 px-3" 
+            style="background: transparent; color: #ff3b30; border: 1px solid #ff3b30;"
+            title="Удалить категорию"
+            data-bs-toggle="tooltip">
+        <i class="fas fa-trash me-2"></i> Удалить категорию
+    </button>
+</form>

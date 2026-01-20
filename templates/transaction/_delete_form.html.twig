@@ -1,0 +1,6 @@
+<form method="post" action="{{ path('app_transaction_delete', {'id': transaction.id}) }}" onsubmit="return confirm('Удалить эту транзакцию?');">
+    <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ transaction.id) }}">
+    <button class="btn btn-smooth" style="background: #ff3b30; color: white;">
+        <i class="fas fa-trash"></i> Удалить
+    </button>
+</form>

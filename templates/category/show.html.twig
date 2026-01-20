@@ -1,0 +1,164 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ category.name }}{% endblock %}
+
+{% block body %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <!-- Заголовок и навигация -->
+        <div class="d-flex align-items-center justify-content-between mb-4">
+            <div class="d-flex align-items-center">
+                <div class="category-icon me-3" style="color: {{ category.color ?? '#007aff' }}; font-size: 2.5rem;">
+                    <i class="fas fa-tag"></i>
+                </div>
+                <div>
+                    <h1 class="h2 mb-1">{{ category.name }}</h1>
+                    <div class="d-flex align-items-center gap-3">
+                        {% if category.type.value == 'income' %}
+                            <span class="badge rounded-pill py-2 px-3" 
+                                  style="background: rgba(52, 199, 89, 0.1); color: #34c759;">
+                                <i class="fas fa-arrow-down me-1"></i>Доход
+                            </span>
+                        {% else %}
+                            <span class="badge rounded-pill py-2 px-3" 
+                                  style="background: rgba(255, 59, 48, 0.1); color: #ff3b30;">
+                                <i class="fas fa-arrow-up me-1"></i>Расход
+                            </span>
+                        {% endif %}
+                        <span class="text-muted">ID: #{{ category.id }}</span>
+                    </div>
+                </div>
+            </div>
+            <a href="{{ path('app_category_index') }}" class="btn btn-smooth" 
+               style="background: transparent; color: #6c757d; border: 1px solid #d2d2d7;">
+                <i class="fas fa-arrow-left me-1"></i> Назад
+            </a>
+        </div>
+
+        <!-- Основная информация -->
+        <div class="card-custom mb-4">
+            <h5 class="fw-semibold mb-4">
+                <i class="fas fa-info-circle me-2 text-primary"></i>Основная информация
+            </h5>
+            
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="info-item mb-4">
+                        <label class="form-label fw-semibold text-muted small mb-1">Название категории</label>
+                        <div class="d-flex align-items-center">
+                            <div class="category-icon me-3" style="color: {{ category.color ?? '#007aff' }};">
+                                <i class="fas fa-tag fa-lg"></i>
+                            </div>
+                            <div class="fw-semibold fs-5">{{ category.name }}</div>
+                        </div>
+                    </div>
+                    
+                    <div class="info-item mb-4">
+                        <label class="form-label fw-semibold text-muted small mb-1">Тип операции</label>
+                        <div>
+                            {% if category.type.value == 'income' %}
+                                <span class="badge rounded-pill py-2 px-3 fs-6" 
+                                      style="background: rgba(52, 199, 89, 0.1); color: #34c759;">
+                                    <i class="fas fa-arrow-down me-1"></i>Доход
+                                </span>
+                            {% else %}
+                                <span class="badge rounded-pill py-2 px-3 fs-6" 
+                                      style="background: rgba(255, 59, 48, 0.1); color: #ff3b30;">
+                                    <i class="fas fa-arrow-up me-1"></i>Расход
+                                </span>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-md-6">
+                    <div class="info-item mb-4">
+                        <label class="form-label fw-semibold text-muted small mb-1">Цвет категории</label>
+                        <div class="d-flex align-items-center">
+                            <div class="color-preview me-3 rounded-3" 
+                                 style="background: {{ category.color ?? '#007aff' }}; width: 40px; height: 40px; border: 3px solid #e9ecef;"></div>
+                            <div class="fw-semibold">{{ category.color ?? 'Не указан' }}</div>
+                        </div>
+                    </div>
+                    
+                    <div class="info-item mb-4">
+                        <label class="form-label fw-semibold text-muted small mb-1">Дата создания</label>
+                        <div class="fw-semibold">
+                            {% if category.createdAt %}
+                                {{ category.createdAt|date('d.m.Y H:i') }}
+                            {% else %}
+                                <span class="text-muted">Не указана</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Действия с категорией -->
+        <div class="card-custom">
+            <h5 class="fw-semibold mb-4">
+                <i class="fas fa-cogs me-2 text-primary"></i>Действия с категорией
+            </h5>
+            
+            <div class="d-flex gap-3 flex-wrap">
+                <a href="{{ path('app_category_edit', {'id': category.id}) }}" 
+                   class="btn btn-smooth btn-primary-smooth py-2 px-4">
+                    <i class="fas fa-edit me-2"></i> Редактировать
+                </a>
+                
+                <a href="{{ path('app_category_index') }}" 
+                   class="btn btn-smooth py-2 px-4"
+                   style="background: transparent; color: #6c757d; border: 1px solid #d2d2d7;">
+                    <i class="fas fa-list me-2"></i> К списку категорий
+                </a>
+
+                <!-- Кнопка удаления -->
+                <div class="ms-auto">
+                    {{ include('category/_delete_form.html.twig') }}
+                </div>
+            </div>
+        </div>
+
+        <!-- Статистика транзакций -->
+        <div class="card-custom mt-4">
+            <h5 class="fw-semibold mb-3">
+                <i class="fas fa-chart-bar me-2 text-primary"></i>Транзакции в этой категории
+            </h5>
+            <div class="text-center py-4">
+                <div class="text-muted">
+                    <i class="fas fa-exchange-alt fa-2x mb-3"></i>
+                    <p>Транзакции в этой категории будут отображаться здесь</p>
+                    <small class="text-muted">Всего транзакций: {{ category.transactions|length }}</small>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.info-item {
+    padding: 1rem;
+    border-radius: 10px;
+    background: rgba(0, 122, 255, 0.02);
+    border: 1px solid rgba(0, 122, 255, 0.1);
+}
+
+.color-preview {
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    transition: transform 0.2s ease;
+}
+
+.color-preview:hover {
+    transform: scale(1.05);
+}
+
+.category-icon {
+    transition: all 0.3s ease;
+}
+
+.category-icon:hover {
+    transform: scale(1.1) rotate(5deg);
+}
+</style>
+{% endblock %}

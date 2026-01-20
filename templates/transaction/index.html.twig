@@ -1,0 +1,424 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Транзакции{% endblock %}
+
+{% block body %}
+
+<div class="container-fluid">
+    <!-- Заголовок и кнопка -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="h2 mb-1">
+                <i class="fas fa-exchange-alt me-2" style="color: #007aff;"></i>Транзакции
+            </h1>
+            <p class="text-muted mb-0">Управление вашими доходами и расходами</p>
+        </div>
+        <a href="{{ path('app_transaction_new') }}" class="btn btn-smooth btn-primary-smooth">
+            <i class="fas fa-plus me-2"></i> Новая транзакция
+        </a>
+    </div>
+
+    <!-- Фильтр по датам -->
+    <div class="card-custom mb-4">
+        <h5 class="fw-semibold mb-3">
+            <i class="fas fa-filter me-2 text-primary"></i>Фильтр по датам
+        </h5>
+        <form method="get" class="row g-3 align-items-end">
+            <div class="col-md-3">
+                <label class="form-label fw-semibold">Начальная дата</label>
+                <input type="date" name="start_date" class="form-control" 
+                       value="{{ start_date|date('Y-m-d') }}">
+            </div>
+            <div class="col-md-3">
+                <label class="form-label fw-semibold">Конечная дата</label>
+                <input type="date" name="end_date" class="form-control" 
+                       value="{{ end_date|date('Y-m-d') }}">
+            </div>
+            <div class="col-md-3">
+                <button type="submit" class="btn btn-smooth btn-primary-smooth w-100">
+                    <i class="fas fa-search me-2"></i> Применить
+                </button>
+            </div>
+            <div class="col-md-3">
+                <a href="{{ path('app_transaction_index') }}" class="btn btn-smooth w-100"
+                   style="background: transparent; color: #6c757d; border: 1px solid #d2d2d7;">
+                    <i class="fas fa-times me-2"></i> Сбросить
+                </a>
+            </div>
+        </form>
+        <div class="mt-2">
+            <small class="text-muted">
+                Показаны транзакции за период: 
+                <strong>{{ start_date|date('d.m.Y') }} - {{ end_date|date('d.m.Y') }}</strong>
+            </small>
+        </div>
+    </div>
+    
+    <div class="card-custom">
+        <form method="post" action="{{ path('app_import_transactions') }}" enctype="multipart/form-data" class="row g-3 align-items-end">
+            <input type="hidden" name="_token" value="{{ csrf_token('import_transaction') }}">
+            
+            <div class="col-md-6">
+                <label class="form-label fw-semibold">Файл Excel (.xlsx)</label>
+                <input type="file" name="excel_file" class="form-control" accept=".xlsx,.xls" required>
+                <small class="text-muted">
+                    Поддерживаются файлы с вкладками по месяцам (например: "Ноябрь 2025"). 
+                    Столбец с датой должен быть помечен как "Дата", суммы - в числовых колонках с названиями категорий.
+                </small>
+            </div>
+            
+            <div class="col-md-3">
+                <label class="form-label fw-semibold">Тип транзакций</label>
+                <select name="transaction_type" class="form-select" required>
+                    <option value="expense">Расходы</option>
+                    <option value="income">Доходы</option>
+                </select>
+            </div>
+            
+            <div class="col-md-3">
+                <button type="submit" class="btn btn-smooth btn-success w-100">
+                    <i class="fas fa-upload me-2"></i> Импортировать
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <!-- Статистика по категориям -->
+    {% if category_stats %}
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <div class="card-custom">
+                <h5 class="fw-semibold mb-3 text-success">
+                    <i class="fas fa-arrow-down me-2"></i>Доходы по категориям
+                </h5>
+                {% set income_categories = category_stats|filter(stat => stat.type == 'income') %}
+                {% if income_categories %}
+                    {% for stat in income_categories %}
+                    <div class="d-flex justify-content-between align-items-center mb-2 pb-2 border-bottom">
+                        <div class="d-flex align-items-center">
+                            <div class="color-preview me-2 rounded-2" 
+                                 style="background: {{ stat.color ?? '#34c759' }}; width: 16px; height: 16px;"></div>
+                            <span class="fw-semibold">{{ stat.category_name }}</span>
+                        </div>
+                        <span class="text-success fw-bold">+{{ stat.total|number_format(2, '.', ' ') }} ₽</span>
+                    </div>
+                    {% endfor %}
+                    <div class="d-flex justify-content-between align-items-center mt-3 pt-2 border-top">
+                        <strong>Всего доходов:</strong>
+                        <strong class="text-success">+{{ total_income|number_format(2, '.', ' ') }} ₽</strong>
+                    </div>
+                {% else %}
+                    <p class="text-muted text-center py-3">Нет доходов за выбранный период</p>
+                {% endif %}
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card-custom">
+                <h5 class="fw-semibold mb-3 text-danger">
+                    <i class="fas fa-arrow-up me-2"></i>Расходы по категориям
+                </h5>
+                {% set expense_categories = category_stats|filter(stat => stat.type == 'expense') %}
+                {% if expense_categories %}
+                    {% for stat in expense_categories %}
+                    <div class="d-flex justify-content-between align-items-center mb-2 pb-2 border-bottom">
+                        <div class="d-flex align-items-center">
+                            <div class="color-preview me-2 rounded-2" 
+                                 style="background: {{ stat.color ?? '#ff3b30' }}; width: 16px; height: 16px;"></div>
+                            <span class="fw-semibold">{{ stat.category_name }}</span>
+                        </div>
+                        <span class="text-danger fw-bold">{{ stat.total|number_format(2, '.', ' ') }} ₽</span>
+                    </div>
+                    {% endfor %}
+                    <div class="d-flex justify-content-between align-items-center mt-3 pt-2 border-top">
+                        <strong>Всего расходов:</strong>
+                        <strong class="text-danger">{{ total_expense|number_format(2, '.', ' ') }} ₽</strong>
+                    </div>
+                {% else %}
+                    <p class="text-muted text-center py-3">Нет расходов за выбранный период</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Список транзакций -->
+    <div class="card-custom">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h5 class="fw-semibold mb-0">
+                <i class="fas fa-list me-2 text-primary"></i>Список транзакций
+                <span class="badge bg-primary ms-2">{{ transactions|length }}</span>
+            </h5>
+            
+            <!-- Сортировка -->
+            <div class="d-flex align-items-center">
+                <label class="form-label mb-0 me-2 fw-semibold">Сортировка:</label>
+                <select class="form-select form-select-sm" id="sortSelect" style="width: auto;">
+                    <option value="date_desc" {% if app.request.get('sort') != 'category' %}selected{% endif %}>
+                        По дате (сначала новые)
+                    </option>
+                    <option value="date_asc" {% if app.request.get('sort') == 'date_asc' %}selected{% endif %}>
+                        По дате (сначала старые)
+                    </option>
+                    <option value="category" {% if app.request.get('sort') == 'category' %}selected{% endif %}>
+                        По категории
+                    </option>
+                    <option value="amount_desc" {% if app.request.get('sort') == 'amount_desc' %}selected{% endif %}>
+                        По сумме (убывание)
+                    </option>
+                    <option value="amount_asc" {% if app.request.get('sort') == 'amount_asc' %}selected{% endif %}>
+                        По сумме (возрастание)
+                    </option>
+                </select>
+            </div>
+        </div>
+
+        {% if transactions %}
+            <div class="table-responsive">
+                <table class="table table-hover align-middle">
+                    <thead class="table-light">
+                        <tr>
+                            <th class="border-0 rounded-start-3">Сумма</th>
+                            <th class="border-0">Категория</th>
+                            <th class="border-0">Описание</th>
+                            <th class="border-0">Дата</th>
+                            <th class="border-0 text-end rounded-end-3">Действия</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    {% if app.request.get('sort') == 'category' %}
+                        {# Группировка по категориям - упрощенный подход #}
+                        {% set current_category = null %}
+                        {% for transaction in transactions|sort((a, b) => a.category.name <=> b.category.name) %}
+                            {% if current_category != transaction.category.name %}
+                                {% set current_category = transaction.category.name %}
+                                <tr class="category-header">
+                                    <td colspan="5" class="bg-light border-bottom">
+                                        <div class="d-flex align-items-center py-2">
+                                            <div class="color-preview me-2 rounded-2" 
+                                                 style="background: {{ transaction.category.color ?? '#007aff' }}; width: 16px; height: 16px;"></div>
+                                            <strong class="text-dark">{{ transaction.category.name }}</strong>
+                                            <small class="text-muted ms-2">
+                                                {% set category_count = transactions|filter(t => t.category.name == current_category)|length %}
+                                                ({{ category_count }} транзакций)
+                                            </small>
+                                        </div>
+                                    </td>
+                                </tr>
+                            {% endif %}
+                            <tr class="transaction-row">
+                                <td>
+                                    {# ИСПРАВЛЕНО: простой способ определения типа категории #}
+                                    {% set category_type = transaction.category.type %}
+                                    {% set category_type_string = category_type is iterable ? category_type|first : category_type %}
+                                    {% set category_type_string = category_type_string is same as('income') or category_type_string is same as('expense') ? category_type_string : category_type_string.value|default(category_type_string) %}
+                                    
+                                    <span class="fw-bold {{ category_type_string == 'income' ? 'text-money-income' : 'text-money-expense' }}">
+                                        {% if category_type_string == 'income' %}
+                                            +{{ transaction.amount|number_format(2, '.', ' ') }} ₽
+                                        {% else %}
+                                            {{ transaction.amount|number_format(2, '.', ' ') }} ₽
+                                        {% endif %}
+                                    </span>
+                                </td>
+                                <td>
+                                    <div class="d-flex align-items-center">
+                                        <div class="color-preview me-2 rounded-2" 
+                                             style="background: {{ transaction.category.color ?? '#007aff' }}; width: 16px; height: 16px;"></div>
+                                        <span class="fw-semibold">{{ transaction.category.name }}</span>
+                                    </div>
+                                </td>
+                                <td>{{ transaction.description|default('—') }}</td>
+                                <td>
+                                    <small class="text-muted">{{ transaction.date ? transaction.date|date('d.m.Y') : '' }}</small>
+                                </td>
+                                <td class="text-end">
+                                    <div class="btn-group btn-group-sm">
+                                        <a href="{{ path('app_transaction_show', {'id': transaction.id}) }}" 
+                                           class="btn btn-smooth" 
+                                           style="background: transparent; color: #007aff; border: 1px solid #007aff;"
+                                           title="Просмотр"
+                                           data-bs-toggle="tooltip">
+                                            <i class="fas fa-eye"></i>
+                                        </a>
+                                        <a href="{{ path('app_transaction_edit', {'id': transaction.id}) }}" 
+                                           class="btn btn-smooth" 
+                                           style="background: transparent; color: #34c759; border: 1px solid #34c759;"
+                                           title="Редактировать"
+                                           data-bs-toggle="tooltip">
+                                            <i class="fas fa-edit"></i>
+                                        </a>
+                                        <form method="post" action="{{ path('app_transaction_delete', {'id': transaction.id}) }}" 
+                                              class="d-inline" 
+                                              onsubmit="return confirm('Вы уверены, что хотите удалить эту транзакцию?');">
+                                            <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ transaction.id) }}">
+                                            <button type="submit" class="btn btn-smooth" 
+                                                    style="background: transparent; color: #ff3b30; border: 1px solid #ff3b30;"
+                                                    title="Удалить"
+                                                    data-bs-toggle="tooltip">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </form>
+                                    </div>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    {% else %}
+                        {# Обычный список без группировки #}
+                        {% for transaction in transactions %}
+                            <tr class="transaction-row">
+                                <td>
+                                    {# ИСПРАВЛЕНО: простой способ определения типа категории #}
+                                    {% set category_type = transaction.category.type %}
+                                    {% set category_type_string = category_type is iterable ? category_type|first : category_type %}
+                                    {% set category_type_string = category_type_string is same as('income') or category_type_string is same as('expense') ? category_type_string : category_type_string.value|default(category_type_string) %}
+                                    
+                                    <span class="fw-bold {{ category_type_string == 'income' ? 'text-money-income' : 'text-money-expense' }}">
+                                        {% if category_type_string == 'income' %}
+                                            +{{ transaction.amount|number_format(2, '.', ' ') }} ₽
+                                        {% else %}
+                                            {{ transaction.amount|number_format(2, '.', ' ') }} ₽
+                                        {% endif %}
+                                    </span>
+                                </td>
+                                <td>
+                                    <div class="d-flex align-items-center">
+                                        <div class="color-preview me-2 rounded-2" 
+                                             style="background: {{ transaction.category.color ?? '#007aff' }}; width: 16px; height: 16px;"></div>
+                                        <span class="fw-semibold">{{ transaction.category.name }}</span>
+                                    </div>
+                                </td>
+                                <td>{{ transaction.description|default('—') }}</td>
+                                <td>
+                                    <small class="text-muted">{{ transaction.date ? transaction.date|date('d.m.Y') : '' }}</small>
+                                </td>
+                                <td class="text-end">
+                                    <div class="btn-group btn-group-sm">
+                                        <a href="{{ path('app_transaction_show', {'id': transaction.id}) }}" 
+                                           class="btn btn-smooth" 
+                                           style="background: transparent; color: #007aff; border: 1px solid #007aff;"
+                                           title="Просмотр"
+                                           data-bs-toggle="tooltip">
+                                            <i class="fas fa-eye"></i>
+                                        </a>
+                                        <a href="{{ path('app_transaction_edit', {'id': transaction.id}) }}" 
+                                           class="btn btn-smooth" 
+                                           style="background: transparent; color: #34c759; border: 1px solid #34c759;"
+                                           title="Редактировать"
+                                           data-bs-toggle="tooltip">
+                                            <i class="fas fa-edit"></i>
+                                        </a>
+                                        <form method="post" action="{{ path('app_transaction_delete', {'id': transaction.id}) }}" 
+                                              class="d-inline" 
+                                              onsubmit="return confirm('Вы уверены, что хотите удалить эту транзакцию?');">
+                                            <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ transaction.id) }}">
+                                            <button type="submit" class="btn btn-smooth" 
+                                                    style="background: transparent; color: #ff3b30; border: 1px solid #ff3b30;"
+                                                    title="Удалить"
+                                                    data-bs-toggle="tooltip">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </form>
+                                    </div>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    {% endif %}
+                    </tbody>
+                </table>
+            </div>
+        {% else %}
+            <div class="text-center py-5">
+                <i class="fas fa-receipt text-muted" style="font-size: 4rem;"></i>
+                <h5 class="text-muted mt-3">Нет транзакций</h5>
+                <p class="text-muted">Создайте свою первую транзакцию или измените период фильтрации</p>
+                <a href="{{ path('app_transaction_new') }}" class="btn btn-smooth btn-primary-smooth">
+                    <i class="fas fa-plus me-2"></i> Создать транзакцию
+                </a>
+            </div>
+        {% endif %}
+    </div>
+</div>
+
+<style>
+.transaction-row:hover {
+    background-color: rgba(0, 122, 255, 0.02);
+}
+
+.color-preview {
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+.table th {
+    font-weight: 600;
+    font-size: 0.875rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: #6c757d;
+}
+
+.btn-group .btn {
+    margin-right: 4px;
+    border-radius: 6px !important;
+}
+
+.btn-group .btn:last-child {
+    margin-right: 0;
+}
+
+.category-header {
+    background-color: #f8f9fa !important;
+}
+
+.category-header td {
+    border-top: 2px solid #dee2e6;
+    border-bottom: 1px solid #dee2e6;
+}
+
+.form-select {
+    border-radius: 8px;
+    border: 1px solid #d2d2d7;
+    padding: 6px 12px;
+}
+
+.form-select:focus {
+    border-color: #007aff;
+    box-shadow: 0 0 0 0.2rem rgba(0, 122, 255, 0.25);
+}
+
+/* ИСПРАВЛЕНО: цвета для доходов и расходов */
+.text-money-income {
+    color: #34c759 !important; /* Зеленый для доходов */
+}
+
+.text-money-expense {
+    color: #ff3b30 !important; /* Красный для расходов */
+}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Инициализация тултипов
+    var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+    var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+        return new bootstrap.Tooltip(tooltipTriggerEl)
+    });
+
+    // Обработчик сортировки
+    const sortSelect = document.getElementById('sortSelect');
+    if (sortSelect) {
+        sortSelect.addEventListener('change', function() {
+            const url = new URL(window.location.href);
+            const sortValue = this.value;
+            
+            if (sortValue === 'date_desc') {
+                url.searchParams.delete('sort');
+            } else {
+                url.searchParams.set('sort', sortValue);
+            }
+            
+            window.location.href = url.toString();
+        });
+    }
+});
+</script>
+{% endblock %}

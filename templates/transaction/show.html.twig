@@ -1,0 +1,56 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Транзакция #{{ transaction.id }}{% endblock %}
+
+{% block body %}
+<div class="container">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1>👁️ Детали транзакции</h1>
+        <a href="{{ path('app_transaction_index') }}" class="btn btn-smooth" style="background: #f2f2f7; color: #1d1d1f;">
+            <i class="fas fa-arrow-left"></i> Назад к списку
+        </a>
+    </div>
+
+    <div class="card-custom">
+        <div class="row">
+            <div class="col-md-6">
+                <div class="mb-4">
+                    <label class="form-label text-muted">Сумма</label>
+                    <div class="h4 {{ transaction.amount < 0 ? 'text-money-expense' : 'text-money-income' }}">
+                        {{ transaction.amount }} BYN
+                    </div>
+                </div>
+                
+                <div class="mb-4">
+                    <label class="form-label text-muted">Категория</label>
+                    <div>
+                        <span class="badge rounded-pill" style="background: {{ transaction.category.color ?? '#007aff' }}; color: white; font-size: 1em;">
+                            {{ transaction.category.name }}
+                        </span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-6">
+                <div class="mb-4">
+                    <label class="form-label text-muted">Дата</label>
+                    <div class="h6">{{ transaction.date ? transaction.date|date('d.m.Y H:i') : '' }}</div>
+                </div>
+                
+                <div class="mb-4">
+                    <label class="form-label text-muted">Описание</label>
+                    <div class="h6">{{ transaction.description|default('—') }}</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="d-flex gap-2 mt-4 pt-4 border-top">
+            <a href="{{ path('app_transaction_edit', {'id': transaction.id}) }}" 
+               class="btn btn-smooth btn-primary-smooth">
+                <i class="fas fa-edit"></i> Редактировать
+            </a>
+            {{ include('transaction/_delete_form.html.twig') }}
+        </div>
+    </div>
+</div>
+{% endblock %}

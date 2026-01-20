@@ -1,0 +1,102 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Новая категория{% endblock %}
+
+{% block body %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card-custom">
+            <!-- Заголовок с навигацией -->
+            <div class="d-flex align-items-center mb-4">
+                <div class="flex-grow-1">
+                    <h1 class="h3 mb-0">
+                        <i class="fas fa-plus-circle me-2" style="color: #34c759;"></i>Создать категорию
+                    </h1>
+                    <p class="text-muted mb-0">Добавьте новую категорию для организации финансов</p>
+                </div>
+                <a href="{{ path('app_category_index') }}" class="btn btn-smooth" 
+                   style="background: transparent; color: #6c757d; border: 1px solid #d2d2d7;"
+                   title="Вернуться к списку категорий"
+                   data-bs-toggle="tooltip">
+                    <i class="fas fa-arrow-left me-1"></i> Назад
+                </a>
+            </div>
+
+            <!-- Форма создания -->
+            {{ include('category/_form.html.twig') }}
+        </div>
+
+        <!-- Подсказки по цветам -->
+        <div class="card-custom mt-4">
+            <h5 class="fw-semibold mb-3">
+                <i class="fas fa-palette me-2 text-warning"></i>Рекомендуемые цвета для категорий
+            </h5>
+            <div class="row">
+                <div class="col-md-6">
+                    <h6 class="text-success small fw-semibold">Для доходов:</h6>
+                    <div class="d-flex flex-wrap gap-2 mb-3">
+                        {% set income_colors = ['#34c759', '#30d158', '#4cd964', '#5ac8fa', '#007aff', '#5856d6'] %}
+                        {% for color in income_colors %}
+                            <div class="color-suggestion rounded-2" 
+                                 style="background: {{ color }}; width: 30px; height: 30px; cursor: pointer;"
+                                 data-color="{{ color }}"
+                                 title="Использовать цвет {{ color }}">
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <h6 class="text-danger small fw-semibold">Для расходов:</h6>
+                    <div class="d-flex flex-wrap gap-2">
+                        {% set expense_colors = ['#ff3b30', '#ff453a', '#ff375f', '#bf5af2', '#ff2d55', '#ff9500'] %}
+                        {% for color in expense_colors %}
+                            <div class="color-suggestion rounded-2" 
+                                 style="background: {{ color }}; width: 30px; height: 30px; cursor: pointer;"
+                                 data-color="{{ color }}"
+                                 title="Использовать цвет {{ color }}">
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.color-suggestion {
+    transition: all 0.2s ease;
+    border: 2px solid transparent;
+}
+
+.color-suggestion:hover {
+    transform: scale(1.1);
+    border-color: #007aff;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Автоподстановка цвета при клике
+    const colorSuggestions = document.querySelectorAll('.color-suggestion');
+    const colorInput = document.querySelector('#category_color');
+    
+    colorSuggestions.forEach(suggestion => {
+        suggestion.addEventListener('click', function() {
+            const color = this.getAttribute('data-color');
+            colorInput.value = color;
+            colorInput.dispatchEvent(new Event('input'));
+            
+            // Визуальный feedback
+            this.style.borderColor = '#007aff';
+            this.style.boxShadow = '0 4px 12px rgba(0,0,0,0.3)';
+            setTimeout(() => {
+                this.style.borderColor = 'transparent';
+                this.style.boxShadow = 'none';
+            }, 1000);
+        });
+    });
+});
+</script>
+{% endblock %}
